@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+    <node pkg="pointcloud2_segments_viz" type="pointcloud2_segments_viz" respawn="false" name="pointcloud2_segments_viz" output="screen">
+        <rosparam file="$(find pointcloud2_segments_viz)/config/viz.yaml" command="load" />
+    </node>
+</launch>
