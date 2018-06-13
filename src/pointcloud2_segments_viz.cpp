@@ -30,17 +30,15 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         pcl::PointCloud<pcl::PointXYZRGB> cloud;
         pcl::fromPCLPointCloud2(cloud2, cloud);
 
-        if (msg.cluster_id.size() > 0 ){
-            for (int u=0; u < msg.cluster_id.size(); u++){
+        if (msg.cluster_id.size() > 0){
                 // ROS_WARN("%u", msg.cluster_id[u]);
 
-                for(size_t j=0; j < cloud.points.size(); j++){
-                    uint8_t r = 255 - 25 * u^8 *i;
-                    uint8_t g = 90 + 40 * u^8 *i;
-                    uint8_t b = 40; 
-                    int32_t rgb = (r << 16) | (g << 8) | b;
-                    cloud.points[j].rgb = *(float*)(&rgb);
-                }
+            for(size_t j=0; j < cloud.points.size(); j++){
+                uint8_t r = 255 - 25 * msg.cluster_id[i]^8;
+                uint8_t g = 90 + 40 * msg.cluster_id[i]^8;
+                uint8_t b = 40; 
+                int32_t rgb = (r << 16) | (g << 8) | b;
+                cloud.points[j].rgb = *(float*)(&rgb);
             }
         }
         else {
