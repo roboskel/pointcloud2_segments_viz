@@ -73,6 +73,7 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         pcl::PCLPointCloud2 clouds;
         pcl::toPCLPointCloud2(cloud, clouds);
         pcl_conversions::fromPCL(clouds, cluster_msgs);
+        cluster_msgs.header.stamp = ros::Time::now();
         cluster_msgs.header.frame_id = base_link_frame;
 
         sensor_msgs::PointCloud2 tmp = sensor_msgs::PointCloud2(accumulator);
