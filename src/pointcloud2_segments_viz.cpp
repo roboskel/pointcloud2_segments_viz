@@ -10,9 +10,12 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #include <pointcloud_msgs/PointCloud2_Segments.h>
 
-
 ros::Publisher pub;
 std::string base_link_frame;
+
+std::vector<uint> red = {0, 0, 255, 255, 255, 102, 102, 204, 0, 255};
+std::vector<uint> green = {0, 255, 0, 255, 255, 102, 102, 0, 255, 152};
+std::vector<uint> blue = {255, 0, 0, 0, 255, 152, 52, 152, 255, 52};
 
 
 void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
@@ -29,47 +32,25 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         pcl::PointCloud<pcl::PointXYZRGB> cloud;
         pcl::fromPCLPointCloud2(cloud2, cloud);
 
-
         if (msg.cluster_id.size() > 0){
-            std::vector<int> v(msg.cluster_id.size());
-            v[i] = msg.cluster_id[i] % 3 ;
+            uint mod = msg.cluster_id[i] % 10;
 
             for(size_t j=0; j < cloud.points.size(); j++){
-                if ( v[i] == 0 ){
-                    uint8_t r = 255 ;
-                    uint8_t g = 255 * msg.cluster_id[i] %255;
-                    uint8_t b = 255 * msg.cluster_id[i] %255;
-                    cloud.points[j].r = r;
-                    cloud.points[j].g = g; 
-                    cloud.points[j].b = b;
-                }
-                if ( v[i] == 1 ){
-                    uint8_t r = 255 * msg.cluster_id[i] %255;
-                    uint8_t g = 255 ;
-                    uint8_t b = 255 * msg.cluster_id[i] %255;
-                    cloud.points[j].r = r;
-                    cloud.points[j].g = g; 
-                    cloud.points[j].b = b;
-                }
-                if ( v[i] == 2 ){
-                    uint8_t r = 255 * msg.cluster_id[i] %255;
-                    uint8_t g = 255 * msg.cluster_id[i] %255;
-                    uint8_t b = 255 ;
-                    cloud.points[j].r = r;
-                    cloud.points[j].g = g;
-                    cloud.points[j].b = b;
-                }
+                cloud.points[j].r = red[mod];
+                cloud.points[j].g = green[mod]; 
+                cloud.points[j].b = blue[mod];
             }
         }
         else {
             for(size_t j=0; j < cloud.points.size(); j++){
-                uint8_t r = 255 - 25 * i;
-                uint8_t g = 90 + 40 * i;
-                uint8_t b = 40;
-                int32_t rgb = (r << 16) | (g << 8) | b;
-                cloud.points[j].rgb = *(float*)(&rgb);
+                    uint mod = j % 10;
+                    cloud.points[j].r = red[mod];
+                    cloud.points[j].g = green[mod]; 
+                    cloud.points[j].b = blue[mod];
+                }
             }
         }
+
         pcl::PCLPointCloud2 clouds;
         pcl::toPCLPointCloud2(cloud, clouds);
         pcl_conversions::fromPCL(clouds, cluster_msgs);
