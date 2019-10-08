@@ -13,9 +13,11 @@
 ros::Publisher pub;
 std::string base_link_frame;
 
-std::vector<uint> red = {0, 0, 255, 255, 255, 102, 102, 204, 0, 255};
-std::vector<uint> green = {0, 255, 0, 255, 255, 102, 102, 0, 255, 152};
-std::vector<uint> blue = {255, 0, 0, 0, 255, 152, 52, 152, 255, 52};
+std::vector<uint> red = {  0,   0,   255, 255, 255, 102, 102, 204, 0,   255, 52,  152, 152, 0,   0,   204, 0, 255};
+std::vector<uint> green = {0,   255, 0,   255, 255, 102, 102, 0,   255, 152, 152, 52,  255, 204, 152, 152, 0, 0};
+std::vector<uint> blue = { 255, 0,   0,   0,   255, 152, 52,  152, 255, 52,  255, 255, 52,  152, 204, 0,   0, 255};
+
+std::map<int, uint> id_colour;
 
 
 void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
@@ -23,6 +25,23 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
     sensor_msgs::PointCloud2 accumulator;
 
     sensor_msgs::PointCloud2 cluster_msgs;
+
+    std::vector<int> to_erase;
+    for (auto it = id_colour.begin(); it != id_colour.end(); ++it){
+        bool found = false;
+        for (size_t i=0; i < msg.cluster_id.size(); i++){
+            if (it->first == msg.cluster_id[i]){
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            to_erase.push_back(it->first);
+        }
+    }
+    for (auto i : to_erase) {
+        id_colour.erase(i);
+    }
 
     for (size_t i=0; i < msg.clusters.size(); i++){
 
@@ -33,20 +52,39 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         pcl::fromPCLPointCloud2(cloud2, cloud);
 
         if (msg.cluster_id.size() > 0){
-            uint mod = msg.cluster_id[i] % 10;
+            uint c = 0;
+            if (id_colour.count(msg.cluster_id[i]) > 0) {
+                c = id_colour[msg.cluster_id[i]];
+            }
+            else{ // Find next unused colour
+                for (uint colour=0; colour < red.size(); colour++ ){
+                    bool found = false;
+                    for (auto it = id_colour.begin(); it != id_colour.end(); ++it){
+                        if (it->second == colour) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found){
+                        c = colour;
+                        id_colour[msg.cluster_id[i]] = c;
+                        break;
+                    }
+                }
+            }
 
             for(size_t j=0; j < cloud.points.size(); j++){
-                cloud.points[j].r = red[mod];
-                cloud.points[j].g = green[mod]; 
-                cloud.points[j].b = blue[mod];
+                cloud.points[j].r = red[c];
+                cloud.points[j].g = green[c];
+                cloud.points[j].b = blue[c];
             }
         }
-        else {
+        else { // Randomly draw if there are no ids
             for(size_t j=0; j < cloud.points.size(); j++){
-                uint mod = j % 10;
+                uint mod = j % red.size();
                 cloud.points[j].r = red[mod];
-                cloud.points[j].g = green[mod]; 
-                cloud.points[j].b = blue[mod];      
+                cloud.points[j].g = green[mod];
+                cloud.points[j].b = blue[mod];
             }
         }
 
