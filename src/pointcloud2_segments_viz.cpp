@@ -81,7 +81,7 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         }
         else { // Randomly draw if there are no ids
             for(size_t j=0; j < cloud.points.size(); j++){
-                uint mod = j % red.size();
+                uint mod = i % red.size();
                 cloud.points[j].r = red[mod];
                 cloud.points[j].g = green[mod];
                 cloud.points[j].b = blue[mod];
