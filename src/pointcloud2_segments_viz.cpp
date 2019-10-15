@@ -11,7 +11,6 @@
 #include <pointcloud_msgs/PointCloud2_Segments.h>
 
 ros::Publisher pub;
-std::string base_link_frame;
 
 std::vector<uint> red = {  0,   0,   255, 255, 255, 102, 102, 204, 0,   255, 52,  152, 152, 0,   0,   204, 0, 255};
 std::vector<uint> green = {0,   255, 0,   255, 255, 102, 102, 0,   255, 152, 152, 52,  255, 204, 152, 152, 0, 0};
@@ -92,7 +91,7 @@ void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
         pcl::toPCLPointCloud2(cloud, clouds);
         pcl_conversions::fromPCL(clouds, cluster_msgs);
         cluster_msgs.header.stamp = ros::Time::now();
-        cluster_msgs.header.frame_id = base_link_frame;
+        cluster_msgs.header.frame_id = msg.header.frame_id;
 
         sensor_msgs::PointCloud2 tmp = sensor_msgs::PointCloud2(accumulator);
 
@@ -110,7 +109,6 @@ int main (int argc, char** argv){
     std::string input_topic;
     std::string out_topic;
     n_.param("pointcloud2_segments_viz/input_topic",input_topic, std::string("/new_pcl"));
-    n_.param("pointcloud2_segments_viz/base_link_frame", base_link_frame, std::string("base_link"));
     n_.param("pointcloud2_segments_viz/out_topic", out_topic, std::string("pointcloud2_segments_viz/pointcloud2"));
 
     ros::Subscriber sub = n_.subscribe (input_topic, 1, pc2s_callback);
