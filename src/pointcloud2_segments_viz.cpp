@@ -8,7 +8,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/ChannelFloat32.h>
 #include <sensor_msgs/point_cloud_conversion.h>
-#include <pointcloud_msgs/PointCloud2_Segments.h>
+#include <roboskel_msgs/PointCloud2_Segments.h>
 
 ros::Publisher pub;
 
@@ -19,7 +19,7 @@ std::vector<uint> blue = { 255, 0,   0,   0,   255, 152, 52,  152, 255, 52,  255
 std::map<int, uint> id_colour;
 
 
-void pc2s_callback (const pointcloud_msgs::PointCloud2_Segments& msg){
+void pc2s_callback (const roboskel_msgs::PointCloud2_Segments& msg){
 
     sensor_msgs::PointCloud2 accumulator;
 
